@@ -25,7 +25,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Please enter a valid employee name");
+                    Console.WriteLine("Please enter a valid option");
                 }
                 do
                 {
@@ -57,11 +57,14 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
                             title = Console.ReadLine();
                             GetApplicationProgramByTitle(title, unitOfWork);
                             break;
+                        case 5:
+                            GetAllApplicationProgram(unitOfWork);
+                            break;
                         default:
                             option = 0;
                             break;
                     }
-                } while (option != 5);
+                } while (option != 6);
                 Console.WriteLine("Have a nice day");
             }
         }
@@ -74,25 +77,40 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
             Console.WriteLine("2. Update application program");
             Console.WriteLine("3. Get application program by id");
             Console.WriteLine("4. Get application program by name");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("4. Get all application programs");
+            Console.WriteLine("6. Exit");
         }
 
         // Application program
         void CreateApplicationProgram(string title, string description, IUnitOfWork unitOfWork)
         {
-            unitOfWork.ProgramService.CreateProgram(title, description).GetAwaiter();
+            var createProgram = unitOfWork.ProgramService.CreateProgram(title, description).GetAwaiter();
+            var result = createProgram.GetResult();
+            Console.WriteLine(result);
         }
         void UpdateApplicationProgram(string id, string title, string description, IUnitOfWork unitOfWork)
         {
-            unitOfWork.ProgramService.UpdateProgram(id, title, description).GetAwaiter();
+            var updateProgam = unitOfWork.ProgramService.UpdateProgram(id, title, description).GetAwaiter();
+            var result = updateProgam.GetResult();
+            Console.WriteLine(result);
         }
         void GetApplicationProgramById(string id, IUnitOfWork unitOfWork)
         {
-            unitOfWork.ProgramService.GetById(id).GetAwaiter();
+            var program = unitOfWork.ProgramService.GetById(id).GetAwaiter();
+            var result = program.GetResult();
+            Console.WriteLine(result);
         }
         void GetApplicationProgramByTitle(string title, IUnitOfWork unitOfWork)
         {
-            unitOfWork.ProgramService.GetByTitle(title).GetAwaiter();
+            var program = unitOfWork.ProgramService.GetByTitle(title).GetAwaiter();
+            var result = program.GetResult();
+            Console.WriteLine(result);
+        }
+        void GetAllApplicationProgram(IUnitOfWork unitOfWork)
+        {
+            var programs = unitOfWork.ProgramService.GetAllProgram().GetAwaiter();
+            var result = programs.GetResult();
+            Console.WriteLine(result);
         }
     }
 }

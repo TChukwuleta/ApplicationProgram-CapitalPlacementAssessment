@@ -1,9 +1,8 @@
 ﻿using ApplicationProgram_CapitalPlacementAssessment.Context;
 using ApplicationProgram_CapitalPlacementAssessment.Core;
+using ApplicationProgram_CapitalPlacementAssessment.Core.Models;
 using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace ApplicationProgram_CapitalPlacementAssessment.Services
 {
@@ -14,7 +13,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
         {
             _context = new ApplicationDbContext();
         }
-        public async Task CreateProgram(string title, string description)
+        public async Task<Result> CreateProgram(string title, string description)
         {
             try
             {
@@ -35,19 +34,46 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     ProgramTypeDesc = ProgramType.FullTime.ToString(),
                     LocationType = LocationType.FullyRemote,
                     LocationTypeDesc = LocationType.FullyRemote.ToString(),
-
+                    Location = "Capital placement"
                 };
                 await _context.ApplicationPrograms.AddAsync(entity);
                 await _context.SaveChangesAsync();
-                Console.WriteLine("Application program created successfully");
+                return Result.Success<ProgramService>("Application program created successfully");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while creating application program. {ex?.Message ?? ex?.InnerException?.Message}");
+                return Result.Exception<ProgramService>($"Creation failed. Title: {title} Description: {description}", ex);
             }
         }
 
-        public async Task GetAllProgram()
+        public async Task<Result> UpdateProgram(string id, string title, string description)
+        {
+            try
+            {
+                if (_context.ApplicationPrograms != null)
+                {
+                    var program = await _context.ApplicationPrograms.FirstOrDefaultAsync(c => c.Id == id);
+                    if (program == null || string.IsNullOrEmpty(program?.Id))
+                    {
+                        return Result.Failure<ProgramService>($"No record found");
+                    }
+                    program.Title = title;
+                    program.Description = description;
+                    await _context.SaveChangesAsync();
+                    return Result.Success<ProgramService>("Application program updated successfully");
+                }
+                else
+                {
+                    return Result.Failure<ProgramService>($"Invalid Table");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Exception<ProgramService>($"Update failed. Id: {id} Title: {title} Description: {description}", ex);
+            }
+        }
+
+        public async Task<Result> GetAllProgram()
         {
             try
             {
@@ -56,22 +82,22 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     var programs = await _context.ApplicationPrograms.ToListAsync();
                     if (programs == null || !programs.Any())
                     {
-                        Console.WriteLine($"No record found");
+                        return Result.Failure<ProgramService>($"No record found");
                     }
-                    Console.WriteLine($"Application programs retrieved successfully. {JsonConvert.SerializeObject(programs)}");
+                    return Result.Success<ProgramService>($"Application programs retrieved successfully", programs);
                 }
                 else
                 {
-                    Console.WriteLine($"No table found for application program");
+                    return Result.Failure<ProgramService>($"Invalid Table");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while retrieving application programs. {ex?.Message ?? ex?.InnerException?.Message}");
+                return Result.Exception<ProgramService>(ex);
             }
         }
 
-        public async Task GetById(string id)
+        public async Task<Result> GetById(string id)
         {
             try
             {
@@ -80,22 +106,22 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     var program = await _context.ApplicationPrograms.FirstOrDefaultAsync(c => c.Id == id);
                     if (program == null || string.IsNullOrEmpty(program?.Id))
                     {
-                        Console.WriteLine($"Invalid program specified");
+                        return Result.Failure<ProgramService>($"No record found");
                     }
-                    Console.WriteLine($"Application program retrieved successfully. {JsonConvert.SerializeObject(program)}");
+                    return Result.Success<ProgramService>($"Application programs retrieved successfully", program);
                 }
                 else
                 {
-                    Console.WriteLine($"No table found for application program");
+                    return Result.Failure<ProgramService>($"Invalid Table");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while retrieving application program. {ex?.Message ?? ex?.InnerException?.Message}");
+                return Result.Exception<ProgramService>($"Id: {id}", ex);
             }
         }
 
-        public async Task GetByTitle(string title)
+        public async Task<Result> GetByTitle(string title)
         {
             try
             {
@@ -104,45 +130,18 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     var program = await _context.ApplicationPrograms.FirstOrDefaultAsync(c => c.Title == title);
                     if (program == null || string.IsNullOrEmpty(program?.Id))
                     {
-                        Console.WriteLine($"Invalid program specified");
+                        return Result.Failure<ProgramService>($"No record found");
                     }
-                    Console.WriteLine($"Application program retrieved successfully. {JsonConvert.SerializeObject(program)}");
+                    return Result.Success<ProgramService>($"Application programs retrieved successfully", program);
                 }
                 else
                 {
-                    Console.WriteLine($"No table found for application program");
+                    return Result.Failure<ProgramService>($"Invalid Table");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while retrieving application program. {ex?.Message ?? ex?.InnerException?.Message}");
-            }
-        }
-
-        public async Task UpdateProgram(string id, string title, string description)
-        {
-            try
-            {
-                if (_context.ApplicationPrograms != null)
-                {
-                    var program = await _context.ApplicationPrograms.FirstOrDefaultAsync(c => c.Id == id);
-                    if (program == null || string.IsNullOrEmpty(program?.Id))
-                    {
-                        Console.WriteLine($"Invalid program specified");
-                    }
-                    program.Title = title;
-                    program.Description = description;
-                    await _context.SaveChangesAsync();
-                    Console.WriteLine($"Application program updated successfully");
-                }
-                else
-                {
-                    Console.WriteLine($"No table found for application program");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred while updating application program. {ex?.Message ?? ex?.InnerException?.Message}");
+                return Result.Exception<ProgramService>($"Title: {title}", ex);
             }
         }
     }

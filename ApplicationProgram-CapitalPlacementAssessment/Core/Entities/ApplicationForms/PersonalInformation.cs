@@ -9,7 +9,7 @@
         public string? Nationality { get; set; }
         public string? ResidentialAddress { get; set; }
         public string? IdNumber { get; set; }
-        public DateOnly? DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         public Gender? Gender { get; set; }
         public string? GenderDesc { get; set; }
     }
