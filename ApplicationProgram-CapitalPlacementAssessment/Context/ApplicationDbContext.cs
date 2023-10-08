@@ -36,8 +36,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Context
             modelBuilder.Entity<ApplicationStage>().OwnsOne(c => c.VideoInterviewStage);
             modelBuilder.Entity<ApplicationForm>().OwnsOne(c => c.PersonalInformation);
             modelBuilder.Entity<ApplicationForm>().OwnsOne(c => c.AdditionalQuestion);
-            modelBuilder.Entity<Profile>().HasMany(c => c.Educations);
-            modelBuilder.Entity<Profile>().HasMany(c => c.WorkExperiences);
+            modelBuilder.Entity<Profile>().OwnsMany(c => c.Educations);
+            modelBuilder.Entity<Profile>().OwnsMany(c => c.WorkExperiences);
         }
     }
 }

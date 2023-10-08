@@ -37,10 +37,10 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                         entity.PersonalInformation = GetPersonalInformationRequest(firstName, lastName);
                         break;
                     case 2:
-                        entity.Profile = GetProfileRequest(position, companyName);
+                        entity.Profile = GetProfileRequest(entity.Id, position, companyName);
                         break;
                     case 3:
-                        entity.AdditionalQuestion = GetAdditionalQuestionRequest(questionType.Value, personalDescription, yearOfGraduation.Value, choice, rejectedByUkEmbassy);
+                        entity.AdditionalQuestion = GetAdditionalQuestionRequest(3, personalDescription, yearOfGraduation.Value, choice, rejectedByUkEmbassy);
                         break;
                     default:
                         break;
@@ -145,7 +145,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             };
             return entity;
         }
-        private Profile GetProfileRequest(string position, string companyName)
+        private Profile GetProfileRequest(string applicationFormId, string position, string companyName)
         {
             List<WorkExperience> workplaces = new List<WorkExperience>();
             workplaces.Add(new WorkExperience
@@ -157,6 +157,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             });
             var entity = new Profile
             {
+                ApplicationFormId = applicationFormId,
                 WorkExperiences = workplaces,
                 Resume = "www.google.com",
                 Educations = new List<Education>()
