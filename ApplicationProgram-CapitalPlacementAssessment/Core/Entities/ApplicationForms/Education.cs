@@ -1,6 +1,6 @@
 ﻿namespace ApplicationProgram_CapitalPlacementAssessment.Core
 {
-    public class Education
+    public class Education : PrimaryEntity
     {
         public required string School { get; set; }
         public Degree Degree { get; set; }

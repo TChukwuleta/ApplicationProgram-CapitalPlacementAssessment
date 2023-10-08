@@ -2,9 +2,10 @@
 {
     public interface IProgramService
     {
-        Task CreateProgram(string name, string description);
-        Task UpdateProgram(string name, string description);
+        Task CreateProgram(string title, string description);
+        Task UpdateProgram(string id, string title, string description);
         Task GetAllProgram();
         Task GetById(string id);
+        Task GetByTitle(string title);
     }
 }

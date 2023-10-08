@@ -1,10 +1,20 @@
-﻿using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
+﻿using ApplicationProgram_CapitalPlacementAssessment.Common;
+using ApplicationProgram_CapitalPlacementAssessment.Context;
+using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
 using ApplicationProgram_CapitalPlacementAssessment.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+// Appsettings connection
+/*IConfiguration configuration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+    .AddJsonFile("appsettings").Build();*/
+
 IHost host = Host.CreateDefaultBuilder()
     .ConfigureServices(services => {
+        services.AddSingleton<ApplicationDbContext>();
+        services.AddSingleton<ApplicationProgramHelper>();
+        //services.AddSingleton<IConfiguration>(configuration);
         services.AddSingleton<IProgramService, ProgramService>();
         services.AddSingleton<IApplicationFormService, ApplicationFormService>();
         services.AddSingleton<IProfileService, ProfileService>();
@@ -13,15 +23,3 @@ IHost host = Host.CreateDefaultBuilder()
     }).Build();
 var app = host.Services.GetRequiredService<IUnitOfWork>();
 app.Run();
-
-PrintOptions();
-
-// Home
-void PrintOptions()
-{
-    Console.WriteLine("Please choose from one of the following options...");
-    Console.WriteLine("1. Application Program");
-    Console.WriteLine("2. Application Form"); 
-    Console.WriteLine("1. Application Stage");
-    Console.WriteLine("2. Profile");
-}

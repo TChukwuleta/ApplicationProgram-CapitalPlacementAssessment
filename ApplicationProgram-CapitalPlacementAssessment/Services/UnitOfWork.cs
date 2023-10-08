@@ -1,4 +1,5 @@
-﻿using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
+﻿using ApplicationProgram_CapitalPlacementAssessment.Common;
+using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
 
 namespace ApplicationProgram_CapitalPlacementAssessment.Services
 {
@@ -6,7 +7,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
     {
         public UnitOfWork()
         {
-            
+            ProgramService = new ProgramService();
         }
         public IApplicationFormService ApplicationFormService { get; private set; }
 
@@ -24,6 +25,51 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
         public void Run()
         {
             Console.WriteLine("Welcome to Capital placement - Application program assessment");
+            BaseCall();
+        }
+
+
+        // Home
+        void PrintOptions()
+        {
+            Console.WriteLine("Please choose from one of the following options...");
+            Console.WriteLine("1. Application Program");
+            Console.WriteLine("2. Application Form");
+            Console.WriteLine("1. Application Stage");
+            Console.WriteLine("2. Profile");
+        }
+        void BaseCall()
+        {
+            Console.WriteLine("Welcome aboard");
+            int option = 0;
+            while (true)
+            {
+                try
+                {
+                    PrintOptions();
+                    option = int.Parse(Console.ReadLine());
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Please enter a valid number");
+                }
+                do
+                {
+                    switch (option)
+                    {
+                        case 0:
+                            BaseCall();
+                            break;
+                        case 1:
+                            new ApplicationProgramHelper().HandleApplicationProgramOptions();
+                            break;
+                        default:
+                            option = 0;
+                            break;
+                    }
+                } while (option != 5);
+                Console.WriteLine("Have a nice day");
+            }
         }
     }
 }
