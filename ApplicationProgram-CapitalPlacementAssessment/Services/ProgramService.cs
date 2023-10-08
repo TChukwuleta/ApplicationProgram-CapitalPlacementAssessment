@@ -97,6 +97,32 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             }
         }
 
+        public async Task<Result> GetAllProgramDetails()
+        {
+            try
+            {
+                if (_context.ApplicationPrograms != null)
+                {
+                    var programs = await _context.ApplicationPrograms.Include(c => c.ApplicationForm).ThenInclude(c => c.PersonalInformation)
+                        .Include(c => c.ApplicationForm).ThenInclude(c => c.AdditionalQuestion)
+                        .Include(c => c.ApplicationForm).ThenInclude(c => c.Profile).ToListAsync();
+                    if (programs == null || !programs.Any())
+                    {
+                        return Result.Failure<ProgramService>($"No record found");
+                    }
+                    return Result.Success<ProgramService>($"Application programs retrieved successfully", programs);
+                }
+                else
+                {
+                    return Result.Failure<ProgramService>($"Invalid Table");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Exception<ProgramService>(ex);
+            }
+        }
+
         public async Task<Result> GetById(string id)
         {
             try
@@ -109,6 +135,33 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                         return Result.Failure<ProgramService>($"No record found");
                     }
                     return Result.Success<ProgramService>($"Application programs retrieved successfully", program);
+                }
+                else
+                {
+                    return Result.Failure<ProgramService>($"Invalid Table");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Exception<ProgramService>($"Id: {id}", ex);
+            }
+        }
+
+        public async Task<Result> GetProgramDetailsById(string id)
+        {
+            try
+            {
+                if (_context.ApplicationPrograms != null && _context.ApplicationForms != null)
+                {
+                    var program = await _context.ApplicationPrograms.Include(c => c.ApplicationForm).ThenInclude(c => c.PersonalInformation)
+                        .Include(c => c.ApplicationForm).ThenInclude(c => c.AdditionalQuestion)
+                        .Include(c => c.ApplicationForm).ThenInclude(c => c.Profile)
+                        .FirstOrDefaultAsync(c => c.Id == id);
+                    if (program == null || string.IsNullOrEmpty(program?.Id))
+                    {
+                        return Result.Failure<ProgramService>($"No record found");
+                    }
+                    return Result.Success<ProgramService>($"Application forms retrieved successfully", program);
                 }
                 else
                 {

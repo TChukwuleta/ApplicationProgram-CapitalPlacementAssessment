@@ -9,5 +9,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Interfaces
         Task<Result> GetAllProgram();
         Task<Result> GetById(string id);
         Task<Result> GetByTitle(string title);
+        Task<Result> GetAllProgramDetails();
+        Task<Result> GetProgramDetailsById(string id);
     }
 }
