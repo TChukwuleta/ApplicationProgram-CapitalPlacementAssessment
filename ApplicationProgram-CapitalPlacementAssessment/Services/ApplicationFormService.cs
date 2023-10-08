@@ -45,8 +45,6 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     default:
                         break;
                 }
-                var applicationProgram = program.Data as ApplicationProgram;
-                applicationProgram.ApplicationForm = entity;
                 await _context.ApplicationForms.AddAsync(entity);
                 await _context.SaveChangesAsync();
                 return Result.Success<ApplicationFormService>("Application program updated successfully with application form");

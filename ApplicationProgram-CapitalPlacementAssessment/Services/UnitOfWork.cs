@@ -66,6 +66,9 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                         case 2:
                             new ApplicationFormHelper().HandleApplicationFormOptions();
                             break;
+                        case 3:
+                            new ApplicationStageHelper().HandleApplicationStageOptions();
+                            break;
                         case 4:
                             new ApplicationProgramHelper().HandleApplicationProgramPreviewOptions();
                             break;
