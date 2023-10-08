@@ -1,6 +1,6 @@
 ﻿namespace ApplicationProgram_CapitalPlacementAssessment.Core
 {
-    public class Profile : PrimaryEntity
+    public class Profile
     {
         public string? Resume { get; set; }
         public List<Education>? Educations { get; set; }
