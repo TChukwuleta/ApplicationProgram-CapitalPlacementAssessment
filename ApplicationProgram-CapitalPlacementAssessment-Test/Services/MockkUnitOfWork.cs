@@ -17,6 +17,12 @@ namespace ApplicationProgram_CapitalPlacementAssessment_Test.Services
             var program = new ApplicationProgram { Title = "Testing", Description = "Testing", LocationTypeDesc = LocationType.FullyRemote.ToString(), ProgramTypeDesc = ProgramType.FullTime.ToString() };
             programs.Add(program);
 
+            List<ApplicationStage> applicationStages = new List<ApplicationStage>();
+            var applicationStage = new ApplicationStage { ApplicationProgramId = programId, Name = title };
+            applicationStages.Add(applicationStage);
+
+
+            // Application program mock
             var programServiceMock = new Mock<IProgramService>();
             programServiceMock
                 .Setup(p => p.CreateProgram(It.IsAny<string>(), It.IsAny<string>()))
@@ -46,8 +52,29 @@ namespace ApplicationProgram_CapitalPlacementAssessment_Test.Services
             .Setup(p => p.GetAllProgramDetails())
             .ReturnsAsync(Result.Success<ProgramService>($"Application programs retrieved successfully", programs));
 
+
+            // Application stage mock
+            var stageServiceMock = new Mock<IApplicationStageService>();
+            stageServiceMock
+                .Setup(p => p.UpdateApplicationProgramWithApplicationStage(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(Result.Success<ApplicationStageService>("Application program updated successfully with application form"));
+
+            stageServiceMock
+            .Setup(p => p.GetById(programId))
+            .ReturnsAsync(Result.Success<ApplicationStageService>($"Application stage retrieved successfully", applicationStage));
+
+            stageServiceMock
+            .Setup(p => p.GetApplicationStagesByProgramId(programId))
+            .ReturnsAsync(Result.Success<ApplicationStageService>($"Application stage retrieved successfully", applicationStage));
+
+            stageServiceMock
+            .Setup(p => p.GetAllProgramStages())
+            .ReturnsAsync(Result.Success<ApplicationStageService>($"Application stages retrieved successfully", applicationStages));
+
+
             var mockUnitOfWOrk = new Mock<IUnitOfWork>();
             mockUnitOfWOrk.SetupGet(u => u.ProgramService).Returns(programServiceMock.Object);
+            mockUnitOfWOrk.SetupGet(u => u.ApplicationStageService).Returns(stageServiceMock.Object);
             mockUnitOfWOrk.Setup(c => c.ProgramService.CreateProgram(title, description));
             return mockUnitOfWOrk;
         }
