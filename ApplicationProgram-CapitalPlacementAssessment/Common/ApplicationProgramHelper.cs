@@ -1,10 +1,11 @@
-﻿using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
+﻿using ApplicationProgram_CapitalPlacementAssessment.Core.Models;
+using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
 using ApplicationProgram_CapitalPlacementAssessment.Services;
 using Newtonsoft.Json;
 
 namespace ApplicationProgram_CapitalPlacementAssessment.Common
 {
-    internal class ApplicationProgramHelper
+    public class ApplicationProgramHelper
     {
         public ApplicationProgramHelper()
         {
@@ -37,7 +38,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
                             title = Console.ReadLine();
                             Console.WriteLine("Please enter a description");
                             description = Console.ReadLine();
-                            CreateApplicationProgram(title, description, unitOfWork);
+                            var createProgramResult = CreateApplicationProgram(title, description, unitOfWork);
+                            Console.WriteLine(createProgramResult.Message);
                             break;
                         case 2:
                             Console.WriteLine("Please enter a valid id");
@@ -46,20 +48,36 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
                             title = Console.ReadLine();
                             Console.WriteLine("Please enter the new description");
                             description = Console.ReadLine();
-                            UpdateApplicationProgram(id, title, description, unitOfWork);
+                            var updateProgramResult = UpdateApplicationProgram(id, title, description, unitOfWork);
+                            Console.WriteLine(updateProgramResult.Message);
                             break;
                         case 3:
                             Console.WriteLine("Please enter a valid id");
                             id = Console.ReadLine();
-                            GetApplicationProgramById(id, unitOfWork);
+                            var programByIdResponse = GetApplicationProgramById(id, unitOfWork);
+                            if (!programByIdResponse.Status)
+                            {
+                                Console.WriteLine(programByIdResponse.Message);
+                            }
+                            Console.WriteLine(JsonConvert.SerializeObject(programByIdResponse.Data));
                             break;
                         case 4:
                             Console.WriteLine("Please enter a valid title");
                             title = Console.ReadLine();
-                            GetApplicationProgramByTitle(title, unitOfWork);
+                            var programByTitleResponse = GetApplicationProgramByTitle(title, unitOfWork);
+                            if (!programByTitleResponse.Status)
+                            {
+                                Console.WriteLine(programByTitleResponse.Message);
+                            }
+                            Console.WriteLine(JsonConvert.SerializeObject(programByTitleResponse.Data));
                             break;
                         case 5:
-                            GetAllApplicationProgram(unitOfWork);
+                            var allApplicationPrograms = GetAllApplicationProgram(unitOfWork);
+                            if (!allApplicationPrograms.Status)
+                            {
+                                Console.WriteLine(allApplicationPrograms.Message);
+                            }
+                            Console.WriteLine(JsonConvert.SerializeObject(allApplicationPrograms.Data));
                             break;
                         default:
                             option = 0;
@@ -93,10 +111,20 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
                         case 1:
                             Console.WriteLine("Please enter a valid id");
                             id = Console.ReadLine();
-                            GetApplicationProgramDetailsById(id, unitOfWork);
+                            var singleProgramResult = GetApplicationProgramDetailsById(id, unitOfWork);
+                            if (!singleProgramResult.Status)
+                            {
+                                Console.WriteLine(singleProgramResult.Message);
+                            }
+                            Console.WriteLine(JsonConvert.SerializeObject(singleProgramResult.Data));
                             break;
                         case 2:
-                            GetAllApplicationProgramDetails(unitOfWork);
+                            var allProgramResult = GetAllApplicationProgramDetails(unitOfWork);
+                            if (!allProgramResult.Status)
+                            {
+                                Console.WriteLine(allProgramResult.Message);
+                            }
+                            Console.WriteLine(JsonConvert.SerializeObject(allProgramResult.Data));
                             break;
                         default:
                             option = 0;
@@ -129,67 +157,47 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
         }
 
         // Application program
-        void CreateApplicationProgram(string title, string description, IUnitOfWork unitOfWork)
+        public Result CreateApplicationProgram(string title, string description, IUnitOfWork unitOfWork)
         {
             var createProgram = unitOfWork.ProgramService.CreateProgram(title, description).GetAwaiter();
             var result = createProgram.GetResult();
-            Console.WriteLine(result.Message);
+            return result;
         }
-        void UpdateApplicationProgram(string id, string title, string description, IUnitOfWork unitOfWork)
+        public Result UpdateApplicationProgram(string id, string title, string description, IUnitOfWork unitOfWork)
         {
             var updateProgam = unitOfWork.ProgramService.UpdateProgram(id, title, description).GetAwaiter();
             var result = updateProgam.GetResult();
-            Console.WriteLine(result.Message);
+            return result;
         }
-        void GetApplicationProgramById(string id, IUnitOfWork unitOfWork)
+        public Result GetApplicationProgramById(string id, IUnitOfWork unitOfWork)
         {
             var program = unitOfWork.ProgramService.GetById(id).GetAwaiter();
             var result = program.GetResult();
-            if (!result.Status)
-            {
-                Console.WriteLine(result.Message);
-            }
-            Console.WriteLine(JsonConvert.SerializeObject(result.Data));
+            return result;
         }
-        void GetApplicationProgramDetailsById(string id, IUnitOfWork unitOfWork)
+        public Result GetApplicationProgramDetailsById(string id, IUnitOfWork unitOfWork)
         {
             var program = unitOfWork.ProgramService.GetProgramDetailsById(id).GetAwaiter();
             var result = program.GetResult();
-            if (!result.Status)
-            {
-                Console.WriteLine(result.Message);
-            }
-            Console.WriteLine(JsonConvert.SerializeObject(result.Data));
+            return result;
         }
-        void GetApplicationProgramByTitle(string title, IUnitOfWork unitOfWork)
+        public Result GetApplicationProgramByTitle(string title, IUnitOfWork unitOfWork)
         {
             var program = unitOfWork.ProgramService.GetByTitle(title).GetAwaiter();
             var result = program.GetResult();
-            if (!result.Status)
-            {
-                Console.WriteLine(result.Message);
-            }
-            Console.WriteLine(JsonConvert.SerializeObject(result.Data));
+            return result;
         }
-        void GetAllApplicationProgram(IUnitOfWork unitOfWork)
+        public Result GetAllApplicationProgram(IUnitOfWork unitOfWork)
         {
             var programs = unitOfWork.ProgramService.GetAllProgram().GetAwaiter();
             var result = programs.GetResult();
-            if (!result.Status)
-            {
-                Console.WriteLine(result.Message);
-            }
-            Console.WriteLine(JsonConvert.SerializeObject(result.Data));
+            return result;
         }
-        void GetAllApplicationProgramDetails(IUnitOfWork unitOfWork)
+        public Result GetAllApplicationProgramDetails(IUnitOfWork unitOfWork)
         {
             var programs = unitOfWork.ProgramService.GetAllProgramDetails().GetAwaiter();
             var result = programs.GetResult();
-            if (!result.Status)
-            {
-                Console.WriteLine(result.Message);
-            }
-            Console.WriteLine(JsonConvert.SerializeObject(result.Data));
+            return result;
         }
     }
 }
