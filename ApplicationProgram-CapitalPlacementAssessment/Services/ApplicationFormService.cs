@@ -28,6 +28,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                 }
                 var entity = new ApplicationForm
                 {
+                    ApplicationProgramId = programId,
                     CoverImage = image
                 };
                 switch (formType)

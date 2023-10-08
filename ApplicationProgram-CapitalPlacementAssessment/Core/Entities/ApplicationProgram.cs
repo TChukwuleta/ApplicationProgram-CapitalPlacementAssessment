@@ -19,5 +19,6 @@
         public string? Location { get; set; }
         public int MaximumApplicationNumber { get; set; }
         public ApplicationForm? ApplicationForm { get; set; }
+        public ApplicationStage? ApplicationStage { get; set; }
     }
 }
