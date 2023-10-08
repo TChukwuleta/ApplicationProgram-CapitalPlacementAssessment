@@ -101,14 +101,23 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
         {
             try
             {
+                IApplicationStageService stageService = new ApplicationStageService();
                 if (_context.ApplicationPrograms != null)
                 {
-                    var programs = await _context.ApplicationPrograms.Include(c => c.ApplicationForm).ThenInclude(c => c.PersonalInformation)
-                        .Include(c => c.ApplicationForm).ThenInclude(c => c.AdditionalQuestion)
-                        .Include(c => c.ApplicationForm).ThenInclude(c => c.Profile).ToListAsync();
+                    var programs = await _context.ApplicationPrograms.ToListAsync();
                     if (programs == null || !programs.Any())
                     {
                         return Result.Failure<ProgramService>($"No record found");
+                    }
+                    foreach (var program in programs)
+                    {
+                        var stage = await stageService.GetApplicationStagesByProgramId(program.Id);
+                        if (!stage.Status || stage?.Data == null)
+                        {
+                            return stage;
+                        }
+                        var applicationStage = stage.Data as ApplicationStage;
+                        program.ApplicationStage = applicationStage;
                     }
                     return Result.Success<ProgramService>($"Application programs retrieved successfully", programs);
                 }
@@ -151,16 +160,21 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
         {
             try
             {
-                if (_context.ApplicationPrograms != null && _context.ApplicationForms != null)
+                IApplicationStageService stageService = new ApplicationStageService();
+                if (_context.ApplicationPrograms != null && _context.ApplicationStages != null)
                 {
-                    var program = await _context.ApplicationPrograms.Include(c => c.ApplicationForm).ThenInclude(c => c.PersonalInformation)
-                        .Include(c => c.ApplicationForm).ThenInclude(c => c.AdditionalQuestion)
-                        .Include(c => c.ApplicationForm).ThenInclude(c => c.Profile)
-                        .FirstOrDefaultAsync(c => c.Id == id);
+                    var program = await _context.ApplicationPrograms.FirstOrDefaultAsync(c => c.Id == id);
                     if (program == null || string.IsNullOrEmpty(program?.Id))
                     {
                         return Result.Failure<ProgramService>($"No record found");
                     }
+                    var stage = await stageService.GetApplicationStagesByProgramId(program.Id);
+                    if (!stage.Status || stage?.Data == null)
+                    {
+                        return stage;
+                    }
+                    var applicationStage = stage.Data as ApplicationStage;
+                    program.ApplicationStage = applicationStage;
                     return Result.Success<ProgramService>($"Application forms retrieved successfully", program);
                 }
                 else

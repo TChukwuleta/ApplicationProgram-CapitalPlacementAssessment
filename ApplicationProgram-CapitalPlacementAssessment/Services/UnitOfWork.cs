@@ -8,15 +8,12 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
         public UnitOfWork()
         {
             ProgramService = new ProgramService();
+            ApplicationStageService = new ApplicationStageService();
+            ApplicationFormService = new ApplicationFormService();
         }
         public IApplicationFormService ApplicationFormService { get; private set; }
-
         public IApplicationStageService ApplicationStageService { get; private set; }
-
-        public IProfileService ProfileService { get; private set; }
-
         public IProgramService ProgramService { get; private set; }
-
         public void Dispose()
         {
             GC.SuppressFinalize(this);

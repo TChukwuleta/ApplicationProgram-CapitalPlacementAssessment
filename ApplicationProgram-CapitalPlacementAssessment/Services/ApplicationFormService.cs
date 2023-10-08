@@ -37,10 +37,10 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                         entity.PersonalInformation = GetPersonalInformationRequest(firstName, lastName);
                         break;
                     case 2:
-                        entity.Profile = GetProfileRequest(position, companyName);
+                        entity.Profile = GetProfileRequest(entity.Id, position, companyName);
                         break;
                     case 3:
-                        entity.AdditionalQuestion = GetAdditionalQuestionRequest(questionType.Value, personalDescription, yearOfGraduation.Value, choice, rejectedByUkEmbassy);
+                        entity.AdditionalQuestion = GetAdditionalQuestionRequest(3, personalDescription, yearOfGraduation.Value, choice, rejectedByUkEmbassy);
                         break;
                     default:
                         break;
@@ -62,7 +62,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             {
                 if (_context.ApplicationForms != null)
                 {
-                    var forms = await _context.ApplicationForms.Include(c => c.PersonalInformation).Include(c => c.AdditionalQuestion).Include(c => c.Profile).ToListAsync();
+                    var forms = await _context.ApplicationForms.ToListAsync();
                     if (forms == null || !forms.Any())
                     {
                         return Result.Failure<ApplicationFormService>($"No record found");
@@ -86,10 +86,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             {
                 if (_context.ApplicationPrograms != null && _context.ApplicationForms != null)
                 {
-                    var form = await _context.ApplicationPrograms.Include(c => c.ApplicationForm).ThenInclude(c => c.PersonalInformation)
-                        .Include(c => c.ApplicationForm).ThenInclude(c => c.AdditionalQuestion)
-                        .Include(c => c.ApplicationForm).ThenInclude(c => c.Profile)
-                        .FirstOrDefaultAsync(c => c.Id == programId);
+                    var form = await _context.ApplicationPrograms.FirstOrDefaultAsync(c => c.Id == programId);
                     if (form == null || string.IsNullOrEmpty(form?.Id))
                     {
                         return Result.Failure<ApplicationFormService>($"No record found");
@@ -148,7 +145,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             };
             return entity;
         }
-        private Profile GetProfileRequest(string position, string companyName)
+        private Profile GetProfileRequest(string applicationFormId, string position, string companyName)
         {
             List<WorkExperience> workplaces = new List<WorkExperience>();
             workplaces.Add(new WorkExperience
@@ -160,6 +157,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             });
             var entity = new Profile
             {
+                ApplicationFormId = applicationFormId,
                 WorkExperiences = workplaces,
                 Resume = "www.google.com",
                 Educations = new List<Education>()
