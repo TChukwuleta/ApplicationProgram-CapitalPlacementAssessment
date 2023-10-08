@@ -62,7 +62,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             {
                 if (_context.ApplicationForms != null)
                 {
-                    var forms = await _context.ApplicationForms.Include(c => c.PersonalInformation).Include(c => c.AdditionalQuestion).Include(c => c.Profile).ToListAsync();
+                    var forms = await _context.ApplicationForms.ToListAsync();
                     if (forms == null || !forms.Any())
                     {
                         return Result.Failure<ApplicationFormService>($"No record found");
@@ -86,10 +86,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             {
                 if (_context.ApplicationPrograms != null && _context.ApplicationForms != null)
                 {
-                    var form = await _context.ApplicationPrograms.Include(c => c.ApplicationForm).ThenInclude(c => c.PersonalInformation)
-                        .Include(c => c.ApplicationForm).ThenInclude(c => c.AdditionalQuestion)
-                        .Include(c => c.ApplicationForm).ThenInclude(c => c.Profile)
-                        .FirstOrDefaultAsync(c => c.Id == programId);
+                    var form = await _context.ApplicationPrograms.FirstOrDefaultAsync(c => c.Id == programId);
                     if (form == null || string.IsNullOrEmpty(form?.Id))
                     {
                         return Result.Failure<ApplicationFormService>($"No record found");

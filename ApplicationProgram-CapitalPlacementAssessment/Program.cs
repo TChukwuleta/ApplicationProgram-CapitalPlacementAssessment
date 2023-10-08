@@ -17,7 +17,6 @@ IHost host = Host.CreateDefaultBuilder()
         //services.AddSingleton<IConfiguration>(configuration);
         services.AddSingleton<IProgramService, ProgramService>();
         services.AddSingleton<IApplicationFormService, ApplicationFormService>();
-        services.AddSingleton<IProfileService, ProfileService>();
         services.AddSingleton<IApplicationStageService, ApplicationStageService>();
         services.AddSingleton<IUnitOfWork, UnitOfWork>();
     }).Build();

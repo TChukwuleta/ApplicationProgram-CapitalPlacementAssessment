@@ -4,7 +4,6 @@
     {
         public IApplicationFormService ApplicationFormService { get; }
         public IApplicationStageService ApplicationStageService { get; }
-        public IProfileService ProfileService { get; }
         public IProgramService ProgramService { get; }
         void Run();
     }
