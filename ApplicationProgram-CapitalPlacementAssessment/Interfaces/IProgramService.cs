@@ -1,11 +1,13 @@
-﻿namespace ApplicationProgram_CapitalPlacementAssessment.Interfaces
+﻿using ApplicationProgram_CapitalPlacementAssessment.Core.Models;
+
+namespace ApplicationProgram_CapitalPlacementAssessment.Interfaces
 {
     public interface IProgramService
     {
-        Task CreateProgram(string title, string description);
-        Task UpdateProgram(string id, string title, string description);
-        Task GetAllProgram();
-        Task GetById(string id);
-        Task GetByTitle(string title);
+        Task<Result> CreateProgram(string title, string description);
+        Task<Result> UpdateProgram(string id, string title, string description);
+        Task<Result> GetAllProgram();
+        Task<Result> GetById(string id);
+        Task<Result> GetByTitle(string title);
     }
 }

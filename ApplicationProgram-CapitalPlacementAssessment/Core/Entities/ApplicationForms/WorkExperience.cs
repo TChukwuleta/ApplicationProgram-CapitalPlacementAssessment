@@ -5,7 +5,7 @@
         public string? Company { get; set; }
         public string? Title { get; set; }
         public string? Location { get; set; }
-        public DateOnly? StartDate { get; set; }
-        public DateOnly? EndDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

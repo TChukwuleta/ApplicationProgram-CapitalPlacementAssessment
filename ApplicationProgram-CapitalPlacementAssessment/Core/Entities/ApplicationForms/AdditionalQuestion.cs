@@ -14,7 +14,7 @@
         public string? QustionTypeDesc { get; set; }
         public string? QuestionDescription { get; set; }
         public string? Choice { get; set; }
-        public int MaximumChoiceALlowed { get; set; }
+        public int MaximumChoiceAllowed { get; set; }
         public bool EnableOthers { get; set; }
         public bool DisqualifyCandidateForNegativeResponse { get; set; }
     }
