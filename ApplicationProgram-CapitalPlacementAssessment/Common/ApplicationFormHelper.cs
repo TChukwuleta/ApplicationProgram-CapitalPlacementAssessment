@@ -1,5 +1,6 @@
 ﻿using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
 using ApplicationProgram_CapitalPlacementAssessment.Services;
+using Newtonsoft.Json;
 
 namespace ApplicationProgram_CapitalPlacementAssessment.Common
 {
@@ -78,25 +79,37 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
         {
             var updateApplicationForm = unitOfWork.ApplicationFormService.UpdateApplicationForm(programId, formType).GetAwaiter();
             var result = updateApplicationForm.GetResult();
-            Console.WriteLine(result);
+            Console.WriteLine(result.Message);
         }
         void GetApplicationFormById(string id, IUnitOfWork unitOfWork)
         {
             var applicationForm = unitOfWork.ApplicationFormService.GetById(id).GetAwaiter();
             var result = applicationForm.GetResult();
-            Console.WriteLine(result);
+            if (!result.Status)
+            {
+                Console.WriteLine(result.Message);
+            }
+            Console.WriteLine(JsonConvert.SerializeObject(result.Data));
         }
         void GetApplicationFormByProgramId(string programId, IUnitOfWork unitOfWork)
         {
             var applicationForm = unitOfWork.ApplicationFormService.GetApplicationFormsByProgramId(programId).GetAwaiter();
             var result = applicationForm.GetResult();
-            Console.WriteLine(result);
+            if (!result.Status)
+            {
+                Console.WriteLine(result.Message);
+            }
+            Console.WriteLine(JsonConvert.SerializeObject(result.Data));
         }
         void GetAllApplicationForm(IUnitOfWork unitOfWork)
         {
             var programs = unitOfWork.ApplicationFormService.GetAllApplicationForms().GetAwaiter();
             var result = programs.GetResult();
-            Console.WriteLine(result);
+            if (!result.Status)
+            {
+                Console.WriteLine(result.Message);
+            }
+            Console.WriteLine(JsonConvert.SerializeObject(result.Data));
         }
     }
 }

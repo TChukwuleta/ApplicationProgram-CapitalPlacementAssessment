@@ -35,8 +35,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             Console.WriteLine("Please choose from one of the following options...");
             Console.WriteLine("1. Application Program");
             Console.WriteLine("2. Application Form");
-            Console.WriteLine("1. Application Stage");
-            Console.WriteLine("2. Profile");
+            Console.WriteLine("3. Application Stage");
+            Console.WriteLine("4. Application Program Preview");
         }
         void BaseCall()
         {
@@ -62,6 +62,12 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                             break;
                         case 1:
                             new ApplicationProgramHelper().HandleApplicationProgramOptions();
+                            break;
+                        case 2:
+                            new ApplicationFormHelper().HandleApplicationFormOptions();
+                            break;
+                        case 4:
+                            new ApplicationProgramHelper().HandleApplicationProgramPreviewOptions();
                             break;
                         default:
                             option = 0;
