@@ -38,7 +38,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Please enter a valid option");
+                    Console.WriteLine("Invalid option");
+                    Environment.Exit(0);
                 }
                 do
                 {
@@ -53,6 +54,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                             stageType = int.Parse(Console.ReadLine());
                             var updateApplicationPogram = UpdateApplicationProgramWithApplicationStage(id, name, stageType, unitOfWork);
                             Console.WriteLine(updateApplicationPogram.Message);
+                            Environment.Exit(0);
                             break;
                         case 2:
                             Console.WriteLine("Please enter a valid applications stage id");
@@ -63,6 +65,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                                 Console.WriteLine(singleApplicationStage.Message);
                             }
                             Console.WriteLine(JsonConvert.SerializeObject(singleApplicationStage.Data));
+                            Environment.Exit(0);
                             break;
                         case 3:
                             Console.WriteLine("Please enter a valid applications program id");
@@ -73,6 +76,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                                 Console.WriteLine(singleApplicationStageByProgramId.Message);
                             }
                             Console.WriteLine(JsonConvert.SerializeObject(singleApplicationStageByProgramId.Data));
+                            Environment.Exit(0);
                             break;
                         case 4:
                             var allApplicationStages = GetAllApplicationStages(unitOfWork);
@@ -81,13 +85,15 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                                 Console.WriteLine(allApplicationStages.Message);
                             }
                             Console.WriteLine(JsonConvert.SerializeObject(allApplicationStages.Data));
+                            Environment.Exit(0);
                             break;
                         default:
-                            option = 0;
+                            Environment.Exit(0);
                             break;
                     }
-                } while (option != 6);
+                } while (option < 5);
                 Console.WriteLine("Have a nice day");
+                Environment.Exit(0);
             }
         }
 

@@ -14,58 +14,40 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
         private static IMapper _mapper;
         public ApplicationFormService()
         {
+            InitializeAutomapper();
             _context = new ApplicationDbContext();
         }
         public async Task<Result> UpdateApplicationForm(string programId, int formType)
         {
             try
             {
+                ApplicationForm entity = new ApplicationForm { ApplicationProgramId = programId };
                 IProgramService programService = new ProgramService();
                 var program = await programService.GetById(programId);
                 if (!program.Status || program?.Data == null)
                 {
                     return program;
                 }
-                var entity = await _context.ApplicationForms.FirstOrDefaultAsync(c => c.ApplicationProgramId == programId);
-                if (entity != null)
+                var applicationForm = await _context.ApplicationForms.FirstOrDefaultAsync(c => c.ApplicationProgramId == programId);
+                if (applicationForm == null)
                 {
-                    switch (formType)
-                    {
-                        case 1:
-                            entity.PersonalInformation = GetPersonalInformationRequest("Tee", "Boss");
-                            break;
-                        case 2:
-                            entity.Profile = GetProfileRequest(entity.Id, "Software developer", "Capital placement");
-                            break;
-                        case 3:
-                            entity.AdditionalQuestion = GetAdditionalQuestionRequest(3, "nil", 2023, "capital placement", false);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                else
-                {
-                    entity = new ApplicationForm
-                    {
-                        ApplicationProgramId = programId,
-                        CoverImage = "www.google.com"
-                    };
-                    switch (formType)
-                    {
-                        case 1:
-                            entity.PersonalInformation = GetPersonalInformationRequest("Tee", "Boss");
-                            break;
-                        case 2:
-                            entity.Profile = GetProfileRequest(entity.Id, "Software developer", "Capital placement");
-                            break;
-                        case 3:
-                            entity.AdditionalQuestion = GetAdditionalQuestionRequest(3, "nil", 2023, "capital placement", false);
-                            break;
-                        default:
-                            break;
-                    }
+                    entity.CoverImage = "www.google.com";
                     await _context.ApplicationForms.AddAsync(entity);
+                    applicationForm = entity;
+                }
+                switch (formType)
+                {
+                    case 1:
+                        applicationForm.PersonalInformation = GetPersonalInformationRequest("Tee", "Boss");
+                        break;
+                    case 2:
+                        applicationForm.Profile = GetProfileRequest(applicationForm.Id, "Software developer", "Capital placement");
+                        break;
+                    case 3:
+                        applicationForm.AdditionalQuestion = GetAdditionalQuestionRequest(3, "nil", 2023, "capital placement", false);
+                        break;
+                    default:
+                        break;
                 }
                 await _context.SaveChangesAsync();
                 return Result.Success<ApplicationFormService>("Application program updated successfully with application form");
@@ -108,8 +90,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             {
                 if (_context.ApplicationPrograms != null && _context.ApplicationForms != null)
                 {
-                    var form = await _context.ApplicationForms.Include(c => c.PersonalInformation)
-                        .Include(c => c.Profile).Include(c => c.AdditionalQuestion).FirstOrDefaultAsync(c => c.ApplicationProgramId == programId);
+                    var form = await _context.ApplicationForms.FirstOrDefaultAsync(c => c.ApplicationProgramId == programId);
                     if (form == null || string.IsNullOrEmpty(form?.Id))
                     {
                         return Result.Failure<ApplicationFormService>($"No record found");
@@ -134,7 +115,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             {
                 if (_context.ApplicationForms != null)
                 {
-                    var form = await _context.ApplicationForms.Include(c => c.PersonalInformation).Include(c => c.AdditionalQuestion).Include(c => c.Profile).FirstOrDefaultAsync(c => c.Id == id);
+                    var form = await _context.ApplicationForms.FirstOrDefaultAsync(c => c.Id == id);
                     if (form == null || string.IsNullOrEmpty(form?.Id))
                     {
                         return Result.Failure<ApplicationFormService>($"No record found");

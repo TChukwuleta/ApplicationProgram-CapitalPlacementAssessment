@@ -18,7 +18,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
             Console.WriteLine("Please choose from one of the following options...");
             Console.WriteLine("1. Update application program with form");
             Console.WriteLine("2. Get application form by id");
-            Console.WriteLine("3. Get application all application forms by application program id");
+            Console.WriteLine("3. Get application application form by application program id");
             Console.WriteLine("4. Get application all application forms");
             Console.WriteLine("5. Exit");
         }
@@ -41,7 +41,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Please enter a valid option");
+                    Console.WriteLine("Invalid option");
+                    Environment.Exit(0);
                 }
                 do
                 {
@@ -54,6 +55,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                             formType = int.Parse(Console.ReadLine());
                             var updateForm = UpdateApplicationForm(programId, formType, unitOfWork);
                             Console.WriteLine(updateForm.Message);
+                            Environment.Exit(0);
                             break;
                         case 2:
                             Console.WriteLine("Please enter a valid id");
@@ -64,6 +66,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                                 Console.WriteLine(applicationForm.Message);
                             }
                             Console.WriteLine(JsonConvert.SerializeObject(applicationForm.Data));
+                            Environment.Exit(0);
                             break;
                         case 3:
                             Console.WriteLine("Please enter application program id");
@@ -74,6 +77,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                                 Console.WriteLine(applicationProgramForm.Message);
                             }
                             Console.WriteLine(JsonConvert.SerializeObject(applicationProgramForm.Data));
+                            Environment.Exit(0);
                             break;
                         case 4:
                             var allApplicationForms = GetAllApplicationForm(unitOfWork);
@@ -82,13 +86,15 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                                 Console.WriteLine(allApplicationForms.Message);
                             }
                             Console.WriteLine(JsonConvert.SerializeObject(allApplicationForms.Data));
+                            Environment.Exit(0);
                             break;
                         default:
-                            option = 0;
+                            Environment.Exit(0);
                             break;
                     }
-                } while (option != 5);
+                } while (option < 5);
                 Console.WriteLine("Have a nice day");
+                Environment.Exit(0);
             }
         }
 

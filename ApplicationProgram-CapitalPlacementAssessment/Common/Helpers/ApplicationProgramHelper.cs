@@ -27,7 +27,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Please enter a valid option");
+                    Console.WriteLine("Invalid option");
+                    Environment.Exit(0);
                 }
                 do
                 {
@@ -40,6 +41,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                             description = Console.ReadLine();
                             var createProgramResult = CreateApplicationProgram(title, description, unitOfWork);
                             Console.WriteLine(createProgramResult.Message);
+                            Environment.Exit(0);
                             break;
                         case 2:
                             Console.WriteLine("Please enter a valid id");
@@ -50,6 +52,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                             description = Console.ReadLine();
                             var updateProgramResult = UpdateApplicationProgram(id, title, description, unitOfWork);
                             Console.WriteLine(updateProgramResult.Message);
+                            Environment.Exit(0);
                             break;
                         case 3:
                             Console.WriteLine("Please enter a valid id");
@@ -60,6 +63,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                                 Console.WriteLine(programByIdResponse.Message);
                             }
                             Console.WriteLine(JsonConvert.SerializeObject(programByIdResponse.Data));
+                            Environment.Exit(0);
                             break;
                         case 4:
                             Console.WriteLine("Please enter a valid title");
@@ -70,6 +74,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                                 Console.WriteLine(programByTitleResponse.Message);
                             }
                             Console.WriteLine(JsonConvert.SerializeObject(programByTitleResponse.Data));
+                            Environment.Exit(0);
                             break;
                         case 5:
                             var allApplicationPrograms = GetAllApplicationProgram(unitOfWork);
@@ -78,12 +83,13 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                                 Console.WriteLine(allApplicationPrograms.Message);
                             }
                             Console.WriteLine(JsonConvert.SerializeObject(allApplicationPrograms.Data));
+                            Environment.Exit(0);
                             break;
                         default:
-                            option = 0;
+                            Environment.Exit(0);
                             break;
                     }
-                } while (option != 6);
+                } while (option < 6);
                 Console.WriteLine("Have a nice day");
             }
         }
@@ -102,7 +108,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Please enter a valid option");
+                    Console.WriteLine("Invalid option");
+                    Environment.Exit(0);
                 }
                 do
                 {
@@ -117,6 +124,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                                 Console.WriteLine(singleProgramResult.Message);
                             }
                             Console.WriteLine(JsonConvert.SerializeObject(singleProgramResult.Data));
+                            Environment.Exit(0);
                             break;
                         case 2:
                             var allProgramResult = GetAllApplicationProgramDetails(unitOfWork);
@@ -125,13 +133,15 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
                                 Console.WriteLine(allProgramResult.Message);
                             }
                             Console.WriteLine(JsonConvert.SerializeObject(allProgramResult.Data));
+                            Environment.Exit(0);
                             break;
                         default:
-                            option = 0;
+                            Environment.Exit(0);
                             break;
                     }
-                } while (option != 6);
+                } while (option < 3);
                 Console.WriteLine("Have a nice day");
+                Environment.Exit(0);
             }
         }
 
