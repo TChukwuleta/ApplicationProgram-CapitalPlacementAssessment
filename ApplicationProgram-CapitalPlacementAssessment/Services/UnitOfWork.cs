@@ -36,6 +36,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             Console.WriteLine("2. Application Form");
             Console.WriteLine("3. Application Stage");
             Console.WriteLine("4. Application Program Preview");
+            Console.WriteLine("5. Exit");
         }
         void BaseCall()
         {
@@ -71,12 +72,17 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                         case 4:
                             new ApplicationProgramHelper().HandleApplicationProgramPreviewOptions();
                             break;
+                        case 5:
+                            Console.WriteLine("Thank you");
+                            Environment.Exit(0);
+                            break;
                         default:
                             option = 0;
                             break;
                     }
-                } while (option != 5);
+                } while (option < 5);
                 Console.WriteLine("Have a nice day");
+                Environment.Exit(0);
             }
         }
     }

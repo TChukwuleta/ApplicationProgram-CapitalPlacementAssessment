@@ -1,6 +1,6 @@
 ﻿namespace ApplicationProgram_CapitalPlacementAssessment.Core
 {
-    public class WorkExperience : PrimaryEntity
+    public class WorkExperience
     {
         public string? Company { get; set; }
         public string? Title { get; set; }
