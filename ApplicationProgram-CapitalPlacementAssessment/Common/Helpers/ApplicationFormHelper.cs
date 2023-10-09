@@ -1,14 +1,15 @@
-﻿using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
+﻿using ApplicationProgram_CapitalPlacementAssessment.Core.Models;
+using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
 using ApplicationProgram_CapitalPlacementAssessment.Services;
 using Newtonsoft.Json;
 
-namespace ApplicationProgram_CapitalPlacementAssessment.Common
+namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
 {
-    internal class ApplicationFormHelper
+    public class ApplicationFormHelper
     {
         public ApplicationFormHelper()
         {
-            
+
         }
 
         // Application Program
@@ -28,7 +29,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
             string title = string.Empty;
             int formType = 0;
             string id = string.Empty;
-            string programId =string.Empty;
+            string programId = string.Empty;
             string description = string.Empty;
             IUnitOfWork unitOfWork = new UnitOfWork();
             while (true)
@@ -51,20 +52,36 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
                             programId = Console.ReadLine();
                             Console.WriteLine("Please enter form type");
                             formType = int.Parse(Console.ReadLine());
-                            UpdateApplicationForm(programId, formType, unitOfWork);
+                            var updateForm = UpdateApplicationForm(programId, formType, unitOfWork);
+                            Console.WriteLine(updateForm.Message);
                             break;
                         case 2:
                             Console.WriteLine("Please enter a valid id");
                             id = Console.ReadLine();
-                            GetApplicationFormById(id, unitOfWork);
+                            var applicationForm = GetApplicationFormById(id, unitOfWork);
+                            if (!applicationForm.Status)
+                            {
+                                Console.WriteLine(applicationForm.Message);
+                            }
+                            Console.WriteLine(JsonConvert.SerializeObject(applicationForm.Data));
                             break;
                         case 3:
                             Console.WriteLine("Please enter application program id");
                             programId = Console.ReadLine();
-                            GetApplicationFormByProgramId(programId, unitOfWork);
+                            var applicationProgramForm = GetApplicationFormByProgramId(programId, unitOfWork);
+                            if (!applicationProgramForm.Status)
+                            {
+                                Console.WriteLine(applicationProgramForm.Message);
+                            }
+                            Console.WriteLine(JsonConvert.SerializeObject(applicationProgramForm.Data));
                             break;
                         case 4:
-                            GetAllApplicationForm(unitOfWork);
+                            var allApplicationForms = GetAllApplicationForm(unitOfWork);
+                            if (!allApplicationForms.Status)
+                            {
+                                Console.WriteLine(allApplicationForms.Message);
+                            }
+                            Console.WriteLine(JsonConvert.SerializeObject(allApplicationForms.Data));
                             break;
                         default:
                             option = 0;
@@ -75,41 +92,29 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
             }
         }
 
-        void UpdateApplicationForm(string programId, int formType, IUnitOfWork unitOfWork)
+        public Result UpdateApplicationForm(string programId, int formType, IUnitOfWork unitOfWork)
         {
             var updateApplicationForm = unitOfWork.ApplicationFormService.UpdateApplicationForm(programId, formType).GetAwaiter();
             var result = updateApplicationForm.GetResult();
-            Console.WriteLine(result.Message);
+            return result;
         }
-        void GetApplicationFormById(string id, IUnitOfWork unitOfWork)
+        public Result GetApplicationFormById(string id, IUnitOfWork unitOfWork)
         {
             var applicationForm = unitOfWork.ApplicationFormService.GetById(id).GetAwaiter();
             var result = applicationForm.GetResult();
-            if (!result.Status)
-            {
-                Console.WriteLine(result.Message);
-            }
-            Console.WriteLine(JsonConvert.SerializeObject(result.Data));
+            return result;
         }
-        void GetApplicationFormByProgramId(string programId, IUnitOfWork unitOfWork)
+        public Result GetApplicationFormByProgramId(string programId, IUnitOfWork unitOfWork)
         {
             var applicationForm = unitOfWork.ApplicationFormService.GetApplicationFormsByProgramId(programId).GetAwaiter();
             var result = applicationForm.GetResult();
-            if (!result.Status)
-            {
-                Console.WriteLine(result.Message);
-            }
-            Console.WriteLine(JsonConvert.SerializeObject(result.Data));
+            return result;
         }
-        void GetAllApplicationForm(IUnitOfWork unitOfWork)
+        public Result GetAllApplicationForm(IUnitOfWork unitOfWork)
         {
             var programs = unitOfWork.ApplicationFormService.GetAllApplicationForms().GetAwaiter();
             var result = programs.GetResult();
-            if (!result.Status)
-            {
-                Console.WriteLine(result.Message);
-            }
-            Console.WriteLine(JsonConvert.SerializeObject(result.Data));
+            return result;
         }
     }
 }

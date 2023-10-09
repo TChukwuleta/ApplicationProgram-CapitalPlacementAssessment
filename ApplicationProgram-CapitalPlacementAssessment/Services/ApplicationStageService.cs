@@ -1,7 +1,9 @@
-﻿using ApplicationProgram_CapitalPlacementAssessment.Context;
+﻿using ApplicationProgram_CapitalPlacementAssessment.Common.DTOs;
+using ApplicationProgram_CapitalPlacementAssessment.Context;
 using ApplicationProgram_CapitalPlacementAssessment.Core;
 using ApplicationProgram_CapitalPlacementAssessment.Core.Models;
 using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationProgram_CapitalPlacementAssessment.Services
@@ -9,9 +11,11 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
     public class ApplicationStageService : IApplicationStageService
     {
         private readonly ApplicationDbContext _context;
+        private static IMapper _mapper;
         public ApplicationStageService()
         {
             _context = new ApplicationDbContext();
+            InitializeAutomapper();
         }
         public async Task<Result> GetAllProgramStages()
         {
@@ -24,7 +28,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     {
                         return Result.Failure<ApplicationStageService>($"No record found");
                     }
-                    return Result.Success<ApplicationStageService>($"Application stages retrieved successfully", applicationStages);
+                    var mappedResponse = _mapper.Map<List<ApplicationStageDto>>(applicationStages);
+                    return Result.Success<ApplicationStageService>($"Application stages retrieved successfully", mappedResponse);
                 }
                 else
                 {
@@ -49,7 +54,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     {
                         return Result.Failure<ApplicationStageService>($"No record found");
                     }
-                    return Result.Success<ApplicationStageService>($"Application stage retrieved successfully", applicationStage);
+                    var mappedResponse = _mapper.Map<ApplicationStageDto>(applicationStage);
+                    return Result.Success<ApplicationStageService>($"Application stage retrieved successfully", mappedResponse);
                 }
                 else
                 {
@@ -73,7 +79,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     {
                         return Result.Failure<ApplicationStageService>($"No record found");
                     }
-                    return Result.Success<ApplicationStageService>($"Application stage retrieved successfully", applicationStage);
+                    var mappedResponse = _mapper.Map<ApplicationStageDto>(applicationStage);
+                    return Result.Success<ApplicationStageService>($"Application stage retrieved successfully", mappedResponse);
                 }
                 else
                 {
@@ -86,7 +93,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             }
         }
 
-        public async Task<Result> UpdateApplicationProgramWithApplicationStage(string programId, string name)
+        public async Task<Result> UpdateApplicationProgramWithApplicationStage(string programId, string name, int stageType)
         {
             try
             {
@@ -97,15 +104,12 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                 {
                     return program;
                 }
-                var entity = new ApplicationStage
+                StageType? stageTypeEnum = (StageType)stageType;
+                if (stageTypeEnum == null)
                 {
-                    ApplicationProgramId = programId,
-                    Name = name,
-                    DisplayStageToCandidate = true,
-                    StageType = StageType.VideoInterview,
-                    StageTypeDesc = StageType.VideoInterview.ToString()
-                };
-                if (entity.StageType == StageType.VideoInterview)
+                    return Result.Failure<ApplicationStageService>($"Invalid stage type");
+                }
+                if (stageTypeEnum == StageType.VideoInterview)
                 {
                     videoInterviewStage.DurationType = DurationType.Seconds;
                     videoInterviewStage.DurationTypeDesc = DurationType.Seconds.ToString();
@@ -113,9 +117,30 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     videoInterviewStage.AdditionalInformation = "Balablue";
                     videoInterviewStage.Question = ":How are you?";
                     videoInterviewStage.VideoSubmissionDeadline = 0;
+                }
+                var entity = await _context.ApplicationStages.FirstOrDefaultAsync(c => c.ApplicationProgramId == programId);
+                if (entity != null) 
+                {
+                    entity.ApplicationProgramId = programId;
+                    entity.Name = name;
+                    entity.DisplayStageToCandidate = true;
+                    entity.StageType = StageType.VideoInterview;
+                    entity.StageTypeDesc = StageType.VideoInterview.ToString();
                     entity.VideoInterviewStage = videoInterviewStage;
                 }
-                await _context.ApplicationStages.AddAsync(entity);
+                else
+                {
+                    entity = new ApplicationStage
+                    {
+                        ApplicationProgramId = programId,
+                        Name = name,
+                        DisplayStageToCandidate = true,
+                        StageType = StageType.VideoInterview,
+                        StageTypeDesc = StageType.VideoInterview.ToString(),
+                        VideoInterviewStage = videoInterviewStage
+                    };
+                    await _context.ApplicationStages.AddAsync(entity);
+                }
                 await _context.SaveChangesAsync();
                 return Result.Success<ApplicationStageService>("Application program updated successfully with application form");
             }
@@ -123,6 +148,15 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             {
                 return Result.Exception<ApplicationStageService>($"Update failed. Program Id: {programId}", ex);
             }
+        }
+
+        private static void InitializeAutomapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ApplicationStage, ApplicationStageDto>().ReverseMap();
+            });
+            _mapper = config.CreateMapper();
         }
     }
 }

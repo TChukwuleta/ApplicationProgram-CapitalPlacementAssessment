@@ -1,4 +1,4 @@
-﻿using ApplicationProgram_CapitalPlacementAssessment.Common;
+﻿using ApplicationProgram_CapitalPlacementAssessment.Common.Helpers;
 using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
 using ApplicationProgram_CapitalPlacementAssessment_Test.Services;
 using Moq;

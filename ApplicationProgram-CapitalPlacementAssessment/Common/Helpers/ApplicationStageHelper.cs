@@ -3,13 +3,13 @@ using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
 using ApplicationProgram_CapitalPlacementAssessment.Services;
 using Newtonsoft.Json;
 
-namespace ApplicationProgram_CapitalPlacementAssessment.Common
+namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
 {
     public class ApplicationStageHelper
     {
         public ApplicationStageHelper()
         {
-            
+
         }
 
         void ApplicationStageOptions()
@@ -27,6 +27,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
             int option = 0;
             string id = string.Empty;
             string name = string.Empty;
+            int stageType = 0;
             IUnitOfWork unitOfWork = new UnitOfWork();
             while (true)
             {
@@ -47,8 +48,10 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
                             Console.WriteLine("Please enter a valid application program id");
                             id = Console.ReadLine();
                             Console.WriteLine("Please enter application stage name");
-                            name = Console.ReadLine();
-                            var updateApplicationPogram = UpdateApplicationProgramWithApplicationStage(id, name, unitOfWork);
+                            name = Console.ReadLine(); 
+                            Console.WriteLine("Please enter application stage type");
+                            stageType = int.Parse(Console.ReadLine());
+                            var updateApplicationPogram = UpdateApplicationProgramWithApplicationStage(id, name, stageType, unitOfWork);
                             Console.WriteLine(updateApplicationPogram.Message);
                             break;
                         case 2:
@@ -88,9 +91,9 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
             }
         }
 
-        public Result UpdateApplicationProgramWithApplicationStage(string id, string name, IUnitOfWork unitOfWork)
+        public Result UpdateApplicationProgramWithApplicationStage(string id, string name, int stageType, IUnitOfWork unitOfWork)
         {
-            var updateProgam = unitOfWork.ApplicationStageService.UpdateApplicationProgramWithApplicationStage(id, name).GetAwaiter();
+            var updateProgam = unitOfWork.ApplicationStageService.UpdateApplicationProgramWithApplicationStage(id, name, stageType).GetAwaiter();
             var result = updateProgam.GetResult();
             return result;
         }

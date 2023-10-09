@@ -1,16 +1,21 @@
-﻿using ApplicationProgram_CapitalPlacementAssessment.Context;
+﻿using ApplicationProgram_CapitalPlacementAssessment.Common.DTOs;
+using ApplicationProgram_CapitalPlacementAssessment.Context;
 using ApplicationProgram_CapitalPlacementAssessment.Core;
 using ApplicationProgram_CapitalPlacementAssessment.Core.Models;
 using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace ApplicationProgram_CapitalPlacementAssessment.Services
 {
     public class ProgramService : IProgramService
     {
         private readonly ApplicationDbContext _context;
+        private static IMapper _mapper;
         public ProgramService()
         {
+            InitializeAutomapper();
             _context = new ApplicationDbContext();
         }
         public async Task<Result> CreateProgram(string title, string description)
@@ -84,7 +89,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     {
                         return Result.Failure<ProgramService>($"No record found");
                     }
-                    return Result.Success<ProgramService>($"Application programs retrieved successfully", programs);
+                    var mappedResponse = _mapper.Map<List<ApplicationProgramDto>>(programs);
+                    return Result.Success<ProgramService>($"Application programs retrieved successfully", mappedResponse);
                 }
                 else
                 {
@@ -102,6 +108,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             try
             {
                 IApplicationStageService stageService = new ApplicationStageService();
+                IApplicationFormService formService = new ApplicationFormService();
                 if (_context.ApplicationPrograms != null)
                 {
                     var programs = await _context.ApplicationPrograms.ToListAsync();
@@ -112,14 +119,21 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     foreach (var program in programs)
                     {
                         var stage = await stageService.GetApplicationStagesByProgramId(program.Id);
-                        if (!stage.Status || stage?.Data == null)
+                        if (stage.Status && stage?.Data != null)
                         {
-                            return stage;
+                            var applicationStage = stage.Data as ApplicationStage;
+                            program.ApplicationStage = applicationStage;
                         }
-                        var applicationStage = stage.Data as ApplicationStage;
-                        program.ApplicationStage = applicationStage;
+
+                        var form = await formService.GetApplicationFormsByProgramId(program.Id);
+                        if (form.Status && form?.Data != null)
+                        {
+                            var applicationForm = stage.Data as ApplicationForm;
+                            program.ApplicationForm = applicationForm;
+                        }
                     }
-                    return Result.Success<ProgramService>($"Application programs retrieved successfully", programs);
+                    var mappedResponse = _mapper.Map<List<ApplicationProgramDto>>(programs);
+                    return Result.Success<ProgramService>($"Application programs retrieved successfully", mappedResponse);
                 }
                 else
                 {
@@ -143,7 +157,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     {
                         return Result.Failure<ProgramService>($"No record found");
                     }
-                    return Result.Success<ProgramService>($"Application programs retrieved successfully", program);
+                    var mappedResponse = _mapper.Map<ApplicationProgramDto>(program);
+                    return Result.Success<ProgramService>($"Application programs retrieved successfully", mappedResponse);
                 }
                 else
                 {
@@ -161,6 +176,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             try
             {
                 IApplicationStageService stageService = new ApplicationStageService();
+                IApplicationFormService formService = new ApplicationFormService();
                 if (_context.ApplicationPrograms != null && _context.ApplicationStages != null)
                 {
                     var program = await _context.ApplicationPrograms.FirstOrDefaultAsync(c => c.Id == id);
@@ -169,13 +185,19 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                         return Result.Failure<ProgramService>($"No record found");
                     }
                     var stage = await stageService.GetApplicationStagesByProgramId(program.Id);
-                    if (!stage.Status || stage?.Data == null)
+                    if (stage.Status && stage?.Data != null)
                     {
-                        return stage;
+                        var applicationStage = stage.Data as ApplicationStage;
+                        program.ApplicationStage = applicationStage;
                     }
-                    var applicationStage = stage.Data as ApplicationStage;
-                    program.ApplicationStage = applicationStage;
-                    return Result.Success<ProgramService>($"Application forms retrieved successfully", program);
+                    var form = await formService.GetApplicationFormsByProgramId(program.Id);
+                    if (form.Status && form?.Data != null)
+                    {
+                        var applicationForm = stage.Data as ApplicationForm;
+                        program.ApplicationForm = applicationForm;
+                    }
+                    var mappedResponse = _mapper.Map<ApplicationProgramDto>(program);
+                    return Result.Success<ProgramService>($"Application forms retrieved successfully", mappedResponse);
                 }
                 else
                 {
@@ -199,7 +221,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     {
                         return Result.Failure<ProgramService>($"No record found");
                     }
-                    return Result.Success<ProgramService>($"Application programs retrieved successfully", program);
+                    var mappedResponse = _mapper.Map<ApplicationProgramDto>(program);
+                    return Result.Success<ProgramService>($"Application programs retrieved successfully", mappedResponse);
                 }
                 else
                 {
@@ -210,6 +233,15 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             {
                 return Result.Exception<ProgramService>($"Title: {title}", ex);
             }
+        }
+
+        private static void InitializeAutomapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ApplicationProgram, ApplicationProgramDto>().ReverseMap();
+            });
+            _mapper = config.CreateMapper();
         }
     }
 }

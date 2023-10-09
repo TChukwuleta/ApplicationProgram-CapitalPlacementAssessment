@@ -1,22 +1,22 @@
-﻿using ApplicationProgram_CapitalPlacementAssessment.Context;
+﻿using ApplicationProgram_CapitalPlacementAssessment.Common.DTOs;
+using ApplicationProgram_CapitalPlacementAssessment.Context;
 using ApplicationProgram_CapitalPlacementAssessment.Core;
 using ApplicationProgram_CapitalPlacementAssessment.Core.Models;
 using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationProgram_CapitalPlacementAssessment.Services
 {
-    internal class ApplicationFormService : IApplicationFormService
+    public class ApplicationFormService : IApplicationFormService
     {
         private readonly ApplicationDbContext _context;
+        private static IMapper _mapper;
         public ApplicationFormService()
         {
             _context = new ApplicationDbContext();
         }
-        public async Task<Result> UpdateApplicationForm(string programId, int formType, string? image = null, 
-            string? position = null, string? companyName = null, string? firstName = null, string? lastName = null,
-            int? questionType = 0, int? yearOfGraduation = 0, string? personalDescription= null, bool rejectedByUkEmbassy = false, 
-            string? choice = null)
+        public async Task<Result> UpdateApplicationForm(string programId, int formType)
         {
             try
             {
@@ -26,26 +26,47 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                 {
                     return program;
                 }
-                var entity = new ApplicationForm
+                var entity = await _context.ApplicationForms.FirstOrDefaultAsync(c => c.ApplicationProgramId == programId);
+                if (entity != null)
                 {
-                    ApplicationProgramId = programId,
-                    CoverImage = image
-                };
-                switch (formType)
-                {
-                    case 1:
-                        entity.PersonalInformation = GetPersonalInformationRequest(firstName, lastName);
-                        break;
-                    case 2:
-                        entity.Profile = GetProfileRequest(entity.Id, position, companyName);
-                        break;
-                    case 3:
-                        entity.AdditionalQuestion = GetAdditionalQuestionRequest(3, personalDescription, yearOfGraduation.Value, choice, rejectedByUkEmbassy);
-                        break;
-                    default:
-                        break;
+                    switch (formType)
+                    {
+                        case 1:
+                            entity.PersonalInformation = GetPersonalInformationRequest("Tee", "Boss");
+                            break;
+                        case 2:
+                            entity.Profile = GetProfileRequest(entity.Id, "Software developer", "Capital placement");
+                            break;
+                        case 3:
+                            entity.AdditionalQuestion = GetAdditionalQuestionRequest(3, "nil", 2023, "capital placement", false);
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                await _context.ApplicationForms.AddAsync(entity);
+                else
+                {
+                    entity = new ApplicationForm
+                    {
+                        ApplicationProgramId = programId,
+                        CoverImage = "www.google.com"
+                    };
+                    switch (formType)
+                    {
+                        case 1:
+                            entity.PersonalInformation = GetPersonalInformationRequest("Tee", "Boss");
+                            break;
+                        case 2:
+                            entity.Profile = GetProfileRequest(entity.Id, "Software developer", "Capital placement");
+                            break;
+                        case 3:
+                            entity.AdditionalQuestion = GetAdditionalQuestionRequest(3, "nil", 2023, "capital placement", false);
+                            break;
+                        default:
+                            break;
+                    }
+                    await _context.ApplicationForms.AddAsync(entity);
+                }
                 await _context.SaveChangesAsync();
                 return Result.Success<ApplicationFormService>("Application program updated successfully with application form");
             }
@@ -67,7 +88,8 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                     {
                         return Result.Failure<ApplicationFormService>($"No record found");
                     }
-                    return Result.Success<ApplicationFormService>($"Application forms retrieved successfully", forms);
+                    var mappedResponse = _mapper.Map<List<ApplicationFormDto>>(forms);
+                    return Result.Success<ApplicationFormService>($"Application forms retrieved successfully", mappedResponse);
                 }
                 else
                 {
@@ -86,12 +108,14 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             {
                 if (_context.ApplicationPrograms != null && _context.ApplicationForms != null)
                 {
-                    var form = await _context.ApplicationPrograms.FirstOrDefaultAsync(c => c.Id == programId);
+                    var form = await _context.ApplicationForms.Include(c => c.PersonalInformation)
+                        .Include(c => c.Profile).Include(c => c.AdditionalQuestion).FirstOrDefaultAsync(c => c.ApplicationProgramId == programId);
                     if (form == null || string.IsNullOrEmpty(form?.Id))
                     {
                         return Result.Failure<ApplicationFormService>($"No record found");
                     }
-                    return Result.Success<ApplicationFormService>($"Application forms retrieved successfully", form.ApplicationForm);
+                    var mappedResponse = _mapper.Map<ApplicationFormDto>(form);
+                    return Result.Success<ApplicationFormService>($"Application forms retrieved successfully", mappedResponse);
                 }
                 else
                 {
@@ -110,12 +134,13 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             {
                 if (_context.ApplicationForms != null)
                 {
-                    var program = await _context.ApplicationForms.Include(c => c.PersonalInformation).Include(c => c.AdditionalQuestion).Include(c => c.Profile).FirstOrDefaultAsync(c => c.Id == id);
-                    if (program == null || string.IsNullOrEmpty(program?.Id))
+                    var form = await _context.ApplicationForms.Include(c => c.PersonalInformation).Include(c => c.AdditionalQuestion).Include(c => c.Profile).FirstOrDefaultAsync(c => c.Id == id);
+                    if (form == null || string.IsNullOrEmpty(form?.Id))
                     {
                         return Result.Failure<ApplicationFormService>($"No record found");
                     }
-                    return Result.Success<ApplicationFormService>($"Application form retrieved successfully", program);
+                    var mappedResponse = _mapper.Map<ApplicationFormDto>(form);
+                    return Result.Success<ApplicationFormService>($"Application form retrieved successfully", mappedResponse);
                 }
                 else
                 {
@@ -145,7 +170,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             };
             return entity;
         }
-        private Profile GetProfileRequest(string applicationFormId, string position, string companyName)
+        private Core.Profile GetProfileRequest(string applicationFormId, string position, string companyName)
         {
             List<WorkExperience> workplaces = new List<WorkExperience>();
             workplaces.Add(new WorkExperience
@@ -155,7 +180,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
                 StartDate = DateTime.Now.AddYears(-3).Date,
                 EndDate = DateTime.Today.Date
             });
-            var entity = new Profile
+            var entity = new Core.Profile
             {
                 ApplicationFormId = applicationFormId,
                 WorkExperiences = workplaces,
@@ -205,6 +230,14 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Services
             question.Choice = choice;
             question.QustionTypeDesc = questionEnum.ToString();
             return entity;
+        }
+        private static void InitializeAutomapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ApplicationForm, ApplicationFormDto>().ReverseMap();
+            });
+            _mapper = config.CreateMapper();
         }
     }
 }

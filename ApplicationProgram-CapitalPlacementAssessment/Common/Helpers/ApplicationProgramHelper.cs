@@ -3,7 +3,7 @@ using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
 using ApplicationProgram_CapitalPlacementAssessment.Services;
 using Newtonsoft.Json;
 
-namespace ApplicationProgram_CapitalPlacementAssessment.Common
+namespace ApplicationProgram_CapitalPlacementAssessment.Common.Helpers
 {
     public class ApplicationProgramHelper
     {
@@ -143,7 +143,7 @@ namespace ApplicationProgram_CapitalPlacementAssessment.Common
             Console.WriteLine("2. Update application program");
             Console.WriteLine("3. Get application program by id");
             Console.WriteLine("4. Get application program by name");
-            Console.WriteLine("4. Get all application programs");
+            Console.WriteLine("5. Get all application programs");
             Console.WriteLine("6. Exit");
         }
 
