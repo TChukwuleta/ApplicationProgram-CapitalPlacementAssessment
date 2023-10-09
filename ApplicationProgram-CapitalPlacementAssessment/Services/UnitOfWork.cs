@@ -1,10 +1,12 @@
-﻿using ApplicationProgram_CapitalPlacementAssessment.Common;
+﻿using ApplicationProgram_CapitalPlacementAssessment.Common.Helpers;
 using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace ApplicationProgram_CapitalPlacementAssessment.Services
 {
     public class UnitOfWork : IUnitOfWork
     {
+        private readonly IConfiguration _config;
         public UnitOfWork()
         {
             ProgramService = new ProgramService();

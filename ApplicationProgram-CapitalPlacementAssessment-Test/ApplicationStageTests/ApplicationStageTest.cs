@@ -1,4 +1,4 @@
-﻿using ApplicationProgram_CapitalPlacementAssessment.Common;
+﻿using ApplicationProgram_CapitalPlacementAssessment.Common.Helpers;
 using ApplicationProgram_CapitalPlacementAssessment.Interfaces;
 using ApplicationProgram_CapitalPlacementAssessment_Test.Services;
 using Moq;
@@ -14,20 +14,10 @@ namespace ApplicationProgram_CapitalPlacementAssessment_Test.ApplicationStageTes
         }
 
         [Fact]
-        public async Task CreateApplicationProgram_RetunsSuccess()
-        {
-            var handler = new ApplicationProgramHelper();
-            var result = handler.CreateApplicationProgram("Test", "Testing application program creation", _unitOfWork.Object);
-            Assert.NotNull(result);
-            Assert.True(result.Status);
-            Assert.NotEmpty(result.Message);
-        }
-
-        [Fact]
         public async Task UpdateApplicationStage_RetunsSuccess()
         {
             var handler = new ApplicationStageHelper();
-            var result = handler.UpdateApplicationProgramWithApplicationStage(Guid.NewGuid().ToString(), "Test", _unitOfWork.Object);
+            var result = handler.UpdateApplicationProgramWithApplicationStage(Guid.NewGuid().ToString(), "Test", 2, _unitOfWork.Object);
             Assert.NotNull(result);
             Assert.True(result.Status);
             Assert.NotEmpty(result.Message);
